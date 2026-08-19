@@ -1,169 +1,160 @@
-using System;
-using System.Collections;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace PC.Component.Software
 {
-	public class Browser : App
-	{
-		[Serializable]
-		private class WebsiteItem
-		{
-			public string url;
+    public class Browser : App
+    {
+        [Serializable]
+        public class WebsiteItem
+        {
+            public string url;
+            public Website page;
+            public bool visible;
 
-			public Website page;
+            [TextArea(2, 4)]
+            public string description;
 
-			public bool visible;
-		}
+            [TextArea(1, 3)]
+            public string[] keywords;
+        }
 
-		[SerializeField]
-		private GameObject home;
+        [Header("UI")]
+        [SerializeField] private WebsiteItem[] websites;
+        [SerializeField] private InputField addressBar;
 
-		[SerializeField]
-		private WebsiteItem[] websites;
+        [SerializeField] private GameObject oggleHome;
+        [SerializeField] private Transform resultsContainer;
+        [SerializeField] private Transform pageContainer;
+        [SerializeField] private GameObject oggleResultPrefab;
 
-		[SerializeField]
-		private InputField addressBar;
+        [SerializeField] private InputField homeSearchInput;
 
-		[SerializeField]
-		private Transform quickAccessPrefab;
+        [SerializeField] private GameObject resultsPage;
+        [SerializeField] private InputField resultsSearchInput;
 
-		[SerializeField]
-		private Transform quickAccessParent;
+        public void SearchFromResults()
+        {
+            if (resultsSearchInput == null) return;
 
-		[SerializeField]
-		private Transform content;
+            addressBar.text = resultsSearchInput.text;  // синхронизируем верхнюю строку
+            Search();
+        }
 
-		[SerializeField]
-		private GameObject loading;
+        private Website currentPage;
 
-		private Coroutine loadingCoroutine;
+        protected override void Start()
+        {
+            base.Start();
+            ShowHome();
+        }
 
-		private Website web;
+        // ================= HOME =================
 
-		private Image background;
+        public void ShowHome()
+        {
+            ClearPage();
+            oggleHome.SetActive(true);
+        }
 
-		protected override void Start()
-		{
-			base.Start();
+        // ================= SEARCH =================
 
-			if (content != null) background = content.GetComponent<UnityEngine.UI.Image>();
+        public void Search()
+        {
+            string query = addressBar.text.ToLower();
 
-			var ws = websites;
-			if (ws == null) return;
+            if (string.IsNullOrEmpty(query))
+                return;
 
-			for (int i = 0; i < ws.Length; i++)
-			{
-				var w = ws[i];
-				if (w == null || !w.visible) continue;
+            ShowResults(query);
+        }
 
-				var t = Instantiate(quickAccessPrefab, quickAccessParent);
-				if (t == null) continue;
+        public void SearchFromHome()
+        {
+            if (homeSearchInput == null) return;
 
-				var iconT = t.GetChild(0);
-				if (iconT != null)
-				{
-					var img = iconT.GetComponent<Image>();
-					if (img != null && w.page.icon != null) img.sprite = w.page.icon;
-				}
+            addressBar.text = homeSearchInput.text;
+            Search();
+        }
 
-				var textT = t.GetChild(1);
-				if (textT != null)
-				{
-					var txt = textT.GetComponent<Text>();
-					if (txt != null && w.page != null) txt.text = w.page.websiteName;
-				}
+        private void ShowResults(string query)
+        {
+            ClearPage();
 
-				var btn = t.GetComponent<Button>();
-				if (btn != null)
-				{
-					int idx = i;
-					btn.onClick.AddListener(() => QuickAccess(idx));
-				}
-			}
-		}
+            oggleHome.SetActive(false);
+            resultsPage.SetActive(true);
 
-		public void Home()
-		{
-			if (addressBar != null) addressBar.text = "";
-			if (home != null) home.SetActive(true);
-			if (background != null) background.enabled = true;
+            resultsSearchInput.text = query; // показываем текст запроса
 
-			var l = loading;
-			if (l != null)
-			{
-				if (l.activeSelf)
-				{
-					StopCoroutine(loadingCoroutine);
-					l.SetActive(false);
-				}
+            for (int i = resultsContainer.childCount - 1; i >= 0; i--)
+                Destroy(resultsContainer.GetChild(i).gameObject);
 
-				var w = web;
-				if (w != null)
-				{
-					var obj = w.gameObject;
-					Destroy(obj);
-					web = null;
-				}
-			}
-		}
+            foreach (var site in websites)
+            {
+                if (!site.visible) continue;
 
-		private void QuickAccess(int index)
-		{
-			var ws = websites;
-			if (ws == null || index < 0 || index >= ws.Length) return;
-			var i = addressBar;
-			if (i == null) return;
-			var item = ws[index];
-			if (item == null) return;
-			i.text = item.url;
-			Search();
-		}
+                if (Matches(site, query))
+                {
+                    var capturedSite = site;
 
-		public void Search()
-		{
-			var l = loading;
-			if (l == null) return;
-			if (l.activeSelf) StopCoroutine(loadingCoroutine);
-			var routine = LoadingAnimation();
-			loadingCoroutine = StartCoroutine(routine);
-		}
+                    var result = Instantiate(oggleResultPrefab, resultsContainer);
 
-		private IEnumerator LoadingAnimation()
-		{
-			if (home != null) home.SetActive(false);
-			if (loading != null) loading.SetActive(true);
-			if (background != null) background.enabled = true;
+                    var item = result.GetComponent<OggleResultItem>();
+                    item.title.text = site.url;
+                    item.description.text = site.description;
 
-			if (web != null)
-			{
-				Destroy(web.gameObject);
-				web = null;
-			}
+                    result.GetComponent<Button>().onClick.AddListener(() =>
+                    {
+                        OpenSite(capturedSite);
+                    });
+                }
+            }
+        }
 
-			var url = addressBar != null ? addressBar.text : null;
-			yield return new WaitForSeconds(2f);
+        // ================= OPEN SITE =================
 
-			var ws = websites;
-			if (ws != null)
-			{
-				for (int i = 0; i < ws.Length; i++)
-				{
-					var item = ws[i];
-					if (item == null) continue;
-					if (item.url == url)
-					{
-						var instance = Instantiate(item.page, content);
-						web = instance;
-						if (web != null) web.Init(system);
-						if (background != null) background.enabled = false;
-						break;
-					}
-				}
-			}
+        private void OpenSite(WebsiteItem site)
+        {
+            ClearPage();
 
-			if (loading != null) loading.SetActive(false);
-		}
-	}
+            oggleHome.SetActive(false);
+
+            var instance = Instantiate(site.page, pageContainer);
+            currentPage = instance;
+            currentPage.Init(system);
+        }
+
+        // ================= CLEAR =================
+
+        private void ClearPage()
+        {
+            resultsPage.SetActive(false);
+
+            if (currentPage != null)
+            {
+                Destroy(currentPage.gameObject);
+                currentPage = null;
+            }
+        }
+
+        // ================= MATCH =================
+
+        private bool Matches(WebsiteItem site, string query)
+        {
+            if (site.url.ToLower().Contains(query))
+                return true;
+
+            if (site.keywords != null)
+            {
+                foreach (var word in site.keywords)
+                {
+                    if (word.ToLower().Contains(query))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-
+using Google.GData.Spreadsheets;
 using Newtonsoft.Json.Linq;
 using PC.Component.Software;
 using UnityEngine;
@@ -14,6 +14,9 @@ namespace PC.Component
 
 		[SerializeField]
 		private bool breakable;
+
+		[SerializeField]
+		private GameObject explode;
 
 		[SerializeField]
 		private float uptime;
@@ -193,6 +196,14 @@ namespace PC.Component
 			health = jObject.Value<float?>("health") ?? health;
 
 			base.FromData(jObject);
+		}
+
+		public void Explode()
+		{
+			var original = explode;
+			var t = transform;
+			Instantiate(original, t.position, t.rotation);
+			Damage();
 		}
 	}
 }

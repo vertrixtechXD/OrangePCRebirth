@@ -321,18 +321,10 @@ public class Main : MonoBehaviour
 		if (focus != null)
 		{
 			focus.SetActive(true);
-			StartCoroutine(resetFocus());
-			unfocusCallback = ExitPressed;
+						unfocusCallback = ExitPressed;
 		}
 	}
 
-	private IEnumerator resetFocus()
-	{
-		yield return new WaitForEndOfFrame();
-		focus.SetActive(false);
-		yield return new WaitForFixedUpdate();
-		focus.SetActive(true);
-	}
 
 	public void Unfocus()
 	{

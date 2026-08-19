@@ -6,6 +6,9 @@ public class Quiz : MonoBehaviour, IPointerClickHandler, IEventSystemHandler
 	[SerializeField]
 	private string[] links;
 
+	[SerializeField]
+	private ConfirmationDialog dialog;
+
 	private static int count;
 
 	private void Start()
@@ -21,10 +24,9 @@ public class Quiz : MonoBehaviour, IPointerClickHandler, IEventSystemHandler
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		var dlg = dialog;
 		var cb = new System.Action(Play);
-		if (ConfirmationDialog.Instance != null) ConfirmationDialog.Instance.Show(@"[AD] Time to Win Now!
-
-Play Bollywood Quizzes  & win coins daily", cb);
+		if (dlg != null) dlg.Show(cb);
 	}
 
 	public void Count()
@@ -35,11 +37,9 @@ Play Bollywood Quizzes  & win coins daily", cb);
 		if (count > 2)
 		{
 			count = 0;
-			var dlg = ConfirmationDialog.Instance;
+			var dlg = dialog;
 			var cb = new System.Action(Play);
-			if (dlg != null) ConfirmationDialog.Instance.Show(@"[AD] Time to Win Now!
-
-Play Bollywood Quizzes  & win coins daily", cb);
+			if (dlg != null) dlg.Show(cb);
 		}
 	}
 

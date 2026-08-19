@@ -31,9 +31,6 @@ public class FileMenu : MonoBehaviour
 	[SerializeField]
 	private MessageBox messageBox;
 
-	[SerializeField]
-	private Texture defaultTexture;
-
 	private List<Load> loads;
 
 	[SerializeField]
@@ -62,15 +59,6 @@ public class FileMenu : MonoBehaviour
 		empty.SetActive(loads.Count == 0);
 	}
 
-	public static bool CompareVersionIgnoringBuild(Version a, Version b)
-	{
-		if (a == null || b == null)
-			return false;
-
-		return a.Major == b.Major &&
-			a.Minor == b.Minor;
-	}
-
 	private bool AddSlot(string path)
 	{
 		try
@@ -84,10 +72,6 @@ public class FileMenu : MonoBehaviour
 			var x = Instantiate(pref, parent, false);
 			x.Find("Name").GetComponent<Text>().text = l.GameData.roomName;
 			x.Find("Hardcore").gameObject.SetActive(l.GameData.hardcore == true);
-			Texture tex = string.IsNullOrEmpty(l.GameData.icon) ? defaultTexture : FormatConverter.StringToTexture(l.GameData.icon);
-			x.Find("Icon").GetComponent<RawImage>().texture = tex;
-			try {x.Find("Info").GetComponent<Text>().text = File.GetLastWriteTime(path).ToString();}
-			catch {x.Find("Info").GetComponent<Text>().text = "-";}
 			// add to load list
 			Load v = new Load();
 			v.graphic = x.gameObject;
@@ -95,7 +79,7 @@ public class FileMenu : MonoBehaviour
 			loads.Add(v);
 			// buttons
 			x.Find("Edit").GetComponent<Button>().onClick.AddListener(() => { ShowFileInformation(v); });
-			x.GetComponent<Button>().onClick.AddListener(() => { MainMenu.Instance.LoadFile(l); });
+			x.Find("Name").GetComponent<Button>().onClick.AddListener(() => { MainMenu.Instance.LoadFile(l); });
 			empty.SetActive(loads.Count == 0);
 			return true;
 		}
@@ -116,9 +100,6 @@ public class FileMenu : MonoBehaviour
 		var x = load.graphic.transform;
 		x.Find("Name").GetComponent<Text>().text = load.loader.GameData.roomName;
 		x.Find("Hardcore").gameObject.SetActive(load.loader.GameData.hardcore == true);
-		Texture tex = FormatConverter.StringToTexture(load.loader.GameData.icon);
-		x.Find("Icon").GetComponent<RawImage>().texture = tex;
-		x.Find("Info").GetComponent<Text>().text = File.GetLastWriteTime(load.loader.Path).ToString();
 	}
 
 	public void DeleteLoadButton(Load load)
@@ -133,52 +114,104 @@ public class FileMenu : MonoBehaviour
 		empty.SetActive(loads.Count == 0);
 	}
 
-	public void Import()
+public void Import()
+{
+        string[] exts = new string[] { "*/*" };
+
+        bool CanReadFile(string path)
 	{
-		string[] exts = new string[] {".pc"};
-		bool CanReadFile(string path)
+		try
 		{
-			try{using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read))return true;}catch{return false;}
+			using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read))
+				return true;
 		}
-		void pickFileCallback(string path)
+		catch
 		{
-			// check perms
-			if (!CanReadFile(path))
-				messageBox.Show(Localization.GetText("No permission to open the file."));
-			// try load
-			try
-			{
-				DataLoader x = new DataLoader(path);
-				x.LoadFromPath();
-			}
-			catch
-			{
-				messageBox.Show(Localization.GetText("Import failed! An error occured while loading the file, please make sure the file version is 1.7.0 and above."));
-			}
-			// move to saves
-			File.Copy(path, SaveUtility.GetNewPath(Path.GetFileNameWithoutExtension(path)));
-			// reimport
-			loads = new List<Load>();
-			for (int i = 0; i < slotParent.transform.childCount; i++)
-				Destroy(slotParent.transform.GetChild(i).gameObject);
-			string fpath = SaveUtility.GetFolderPath();
-			string pattern = "*" + SaveUtility.extension;
-			// get date list
-			Dictionary<string, DateTime> nList = new Dictionary<string, DateTime>();
-			foreach (var b in Directory.GetFiles(fpath, pattern))
-			{
-				DateTime f = File.GetLastWriteTime(b);
-				nList.Add(b, f);
-			}
-			// sort
-			var sort = nList.OrderByDescending(kvp => kvp.Value);
-			// append
-			foreach (var j in sort)
-			{
-				AddSlot(j.Key);
-			}
-			empty.SetActive(loads.Count == 0);
+			return false;
 		}
-		NativeFilePicker.PickFile(pickFileCallback, exts);
 	}
+
+	void pickFileCallback(string path)
+	{
+		if (string.IsNullOrEmpty(path))
+			return;
+
+		if (!CanReadFile(path))
+		{
+			messageBox.Show(Localization.GetText("No permission to open the file."));
+			return;
+		}
+
+		try
+		{
+			string ext = System.IO.Path.GetExtension(path).ToLower();
+
+			if (ext == ".pc")
+			{
+				// Загружаем старый PC файл
+				DataLoader oldLoader = new DataLoader(path);
+				oldLoader.LoadFromPath();
+
+				// Создаем новый OPC файл
+				string newPath = SaveUtility.GetNewPath(
+					System.IO.Path.GetFileNameWithoutExtension(path)
+				);
+
+				DataLoader newLoader = new DataLoader(newPath, oldLoader.GameData);
+				newLoader.Content = oldLoader.Content;
+				newLoader.WriteToFile();
+			}
+			else if (ext == ".opc")
+			{
+				File.Copy(
+					path,
+					SaveUtility.GetNewPath(
+						System.IO.Path.GetFileNameWithoutExtension(path)
+					),
+					true
+				);
+			}
+			else
+			{
+				messageBox.Show("Unsupported file format.");
+				return;
+			}
+		}
+		catch
+		{
+			messageBox.Show(
+				Localization.GetText(
+					"Import failed! An error occured while loading the file, please make sure the file version is 1.7.0 and above."
+				)
+			);
+			return;
+		}
+
+		// Обновляем список сохранений
+		loads = new List<Load>();
+
+		for (int i = 0; i < slotParent.childCount; i++)
+			Destroy(slotParent.GetChild(i).gameObject);
+
+		string fpath = SaveUtility.GetFolderPath();
+		string pattern = "*" + SaveUtility.extension;
+
+		Dictionary<string, DateTime> nList = new Dictionary<string, DateTime>();
+
+		foreach (var b in Directory.GetFiles(fpath, pattern))
+		{
+			DateTime f = File.GetLastWriteTime(b);
+			nList.Add(b, f);
+		}
+
+		var sort = nList.OrderByDescending(kvp => kvp.Value);
+
+		foreach (var j in sort)
+			AddSlot(j.Key);
+
+		empty.SetActive(loads.Count == 0);
+	}
+
+	NativeFilePicker.PickFile(pickFileCallback, exts);
+}
 }

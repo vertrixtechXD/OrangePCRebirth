@@ -48,7 +48,14 @@ public class Item : MonoBehaviour, ISave
 
 	protected virtual void Start()
 	{
-		if (Id == 0) Id = Main.Instance.GetNewId(this);
+        if (Main.Instance == null)
+        {
+            Debug.LogWarning($"Main.Instance == null in {name}");
+            return;
+        }
+
+        if (Id == 0)
+            Id = Main.Instance.GetNewId(this);
 	}
 
 	public virtual string GetInfo()

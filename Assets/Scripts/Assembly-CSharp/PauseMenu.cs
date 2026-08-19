@@ -5,7 +5,13 @@ using UnityEngine.UI;
 
 public class PauseMenu : MonoBehaviour
 {
-	[SerializeField]
+    [SerializeField]
+    private Slider fovSlider;
+
+    [SerializeField]
+    private Text fovText;
+
+    [SerializeField]
 	private Slider volumeSlider;
 
 	[SerializeField]
@@ -22,26 +28,52 @@ public class PauseMenu : MonoBehaviour
 
 	private static int videoCount;
 
-	private void Start()
+    private void Start()
+    {
+        if (volumeSlider != null)
+            volumeSlider.value = PlayerPrefs.GetFloat("Volume", 1f);
+
+        if (sensitivitySlider != null)
+        {
+            var p = Player.Instance;
+            if (p != null)
+                sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", p.Sensitivity);
+        }
+
+        if (fovSlider != null)
+        {
+            Camera cam = Camera.main;
+
+            if (cam != null)
+            {
+                float fov = PlayerPrefs.GetFloat("FOV", cam.fieldOfView);
+                cam.fieldOfView = fov;
+                fovSlider.value = fov;
+            }
+        }
+
+        if (volumeSlider != null)
+            OnVolumeChanged(volumeSlider.value);
+
+        if (sensitivitySlider != null)
+            OnSensitivityChanged(sensitivitySlider.value);
+
+        if (fovSlider != null)
+            OnFOVChanged(fovSlider.value);
+
+        if (volumeSlider != null)
+            volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+
+        if (sensitivitySlider != null)
+            sensitivitySlider.onValueChanged.AddListener(OnSensitivityChanged);
+
+        if (fovSlider != null)
+            fovSlider.onValueChanged.AddListener(OnFOVChanged);
+    }
+
+    public void ExitWithoutSave()
 	{
-		if (volumeSlider != null) volumeSlider.value = PlayerPrefs.GetFloat("Volume", 1f);
-
-		if (sensitivitySlider != null)
-		{
-			var p = Player.Instance;
-			if (p != null) sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", p.Sensitivity);
-		}
-
-		if (volumeSlider != null) OnVolumeChanged(volumeSlider.value);
-		if (sensitivitySlider != null) OnSensitivityChanged(sensitivitySlider.value);
-
-		if (volumeSlider != null) volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-		if (sensitivitySlider != null) sensitivitySlider.onValueChanged.AddListener(OnSensitivityChanged);
-	}
-
-	public void ExitWithoutSave()
-	{
-		warningDialog.Show(Localization.GetText("Are you sure?"), () =>
+		warningDialog.Show(() =>
 		{
 			MainMenu();	
 		});
@@ -76,7 +108,21 @@ public class PauseMenu : MonoBehaviour
 		volumeText.text = t + ": " + v + "%";
 	}
 
-	public void Restart()
+    public void OnFOVChanged(float value)
+    {
+        Camera cam = Camera.main;
+
+        if (cam != null)
+            cam.fieldOfView = value;
+
+        PlayerPrefs.SetFloat("FOV", value);
+        PlayerPrefs.Save();
+
+        var t = Localization.GetText("FOV");
+        fovText.text = t + ": " + value.ToString("0");
+    }
+
+    public void Restart()
 	{
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
@@ -85,5 +131,6 @@ public class PauseMenu : MonoBehaviour
 	{
 		if (volumeSlider != null) PlayerPrefs.SetFloat("Volume", volumeSlider.value);
 		if (sensitivitySlider != null) PlayerPrefs.SetFloat("Sensitivity", sensitivitySlider.value);
-	}
+        if (fovSlider != null) PlayerPrefs.SetFloat("FOV", fovSlider.value);
+    }
 }

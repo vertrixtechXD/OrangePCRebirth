@@ -1,147 +1,212 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Даем псевдоним GameOS, чтобы Unity не путала игровую ОС со стандартной системной
+using GameOS = PC.Component.Software.OS.OperatingSystem;
+
 namespace PC.Component.Software
 {
-	public class Personalization : App
-	{
-		[SerializeField]
-		private Text editPictureText;
+    public class Personalization : App
+    {
+        [SerializeField]
+        private Text editPictureText;
 
-		[SerializeField]
-		private RawImage userPicture;
+        [SerializeField]
+        private RawImage userPicture;
 
-		[SerializeField]
-		private InputField userNameInput;
+        [SerializeField] 
+        private GameObject wallpaperDialog;
 
-		[SerializeField]
-		private InputField passwordInput;
+        [SerializeField]
+        private InputField userNameInput;
 
-		protected override void Start()
-		{
-			base.Start();
-			RefreshPicture();
+        [SerializeField]
+        private InputField passwordInput;
 
-			var os = system;
-			if (os == null) return;
+        protected override void Start()
+        {
+            base.Start();
+            RefreshPicture();
 
-			if (userNameInput != null) userNameInput.text = os.UserName;
+            var os = system as GameOS;
+            if (os == null) return;
 
-			var all = os.AllStorage;
-			if (all != null && all.Count > 0)
-			{
-				var st = all[0] as Storage;
-				if (st != null && passwordInput != null) passwordInput.text = st.password;
-			}
-		}
+            if (userNameInput != null) userNameInput.text = os.UserName;
 
-		private void RefreshPicture()
-		{
-			var os = system;
-			if (os == null) return;
+            var all = os.AllStorage;
+            if (all != null && all.Count > 0)
+            {
+                var st = all[0] as Storage;
+                if (st != null && passwordInput != null) passwordInput.text = st.password;
+            }
+        }
 
-			if (userPicture != null) userPicture.texture = os.UserPicture();
+        private void RefreshPicture()
+        {
+            var os = system as GameOS;
+            if (os == null) return;
 
-			var hasPath = !string.IsNullOrEmpty(os.UserPicturePath);
-			if (editPictureText != null) editPictureText.text = Localization.GetText(hasPath ? "Clear" : "Edit");
-		}
+            if (userPicture != null) userPicture.texture = os.UserPicture();
 
-		public void EditPicture()
-		{
-			var os = system;
-			if (os == null) return;
+            var hasPath = !string.IsNullOrEmpty(os.UserPicturePath);
+            if (editPictureText != null) editPictureText.text = Localization.GetText(hasPath ? "Clear" : "Edit");
+        }
 
-			var path = os.UserPicturePath;
-			if (string.IsNullOrEmpty(path))
-			{
-				Action<File> cb = file =>
-				{
-					if (file == null) return;
-					os.UserPicturePath = file.path;
-					RefreshPicture();
-				};
-				os.SelectFile(".pic", cb);
-			}
-			else
-			{
-				os.UserPicturePath = "";
-				RefreshPicture();
-			}
-		}
+        // ==========================================
+        // ЛОГИКА ОБОЕВ
+        // ==========================================
 
-		public void EditUserName()
-		{
-			var i = userNameInput;
-			if (i == null) return;
-			i.interactable = true;
-			i.ActivateInputField();
-		}
+        // ЭТУ ФУНКЦИЮ ПОВЕСИТЬ НА КНОПКУ "Set" РЯДОМ С "Custom background"
+        public void SelectCustomBackground()
+        {
+            var os = system as GameOS;
+            if (os == null) return;
 
-		public void OnEndEditUserName(string name)
-		{
-			var os = system;
-			if (os == null) return;
-			var input = userNameInput;
+            Action<File> cb = file =>
+            {
+                if (file == null) return;
+                // Сохраняем в систему новые обои
+                os.SetCustomBackgroundPath(file.path);
+            };
 
-			if (string.IsNullOrEmpty(name))
-			{
-				if (input != null) input.text = os.UserName;
-			}
-			else
-			{
-				os.UserName = name;
-			}
+            // Открываем проводник для поиска картинок
+            os.SelectFile(".pic", cb);
+        }
 
-			StartCoroutine(DisableInput(input));
-		}
+        // Стандартная смена обоев (кликаем по квадратикам внизу)
+        public void ChangeBackground(int index)
+        {
+            var os = system as GameOS;
+            if (os == null) return;
 
-		public void CustomBackground()
-		{
-			var os = system;
-			if (os == null) return;
-			os.SelectFile(".pic", (file) =>
-			{
-				os.UpdateBackground(-1, file.path);
-			});
-		}
+            os.UpdateBackground(index);
+        }
 
-		public void EditPassword()
-		{
-			var i = passwordInput;
-			if (i == null) return;
-			i.interactable = true;
-			i.ActivateInputField();
-		}
+        // ==========================================
 
-		public void OnEndEditPassword(string password)
-		{
-			var os = system;
-			if (os == null) return;
-			var all = os.AllStorage;
-			if (all == null || all.Count == 0) return;
-			var st = all[0] as Storage;
-			if (st == null) return;
-			st.password = password;
-			StartCoroutine(DisableInput(passwordInput));
-		}
+        public void EditPicture()
+        {
+            var os = system as GameOS;
+            if (os == null) return;
 
-		public void ChangeBackground(int index)
-		{
-			var os = system;
-			if (os == null) return;
-			os.UpdateBackground(index);
-		}
+            var path = os.UserPicturePath;
+            if (string.IsNullOrEmpty(path))
+            {
+                Action<File> cb = file =>
+                {
+                    if (file == null) return;
+                    os.UserPicturePath = file.path;
+                    RefreshPicture();
+                };
+                os.SelectFile(".pic", cb);
+            }
+            else
+            {
+                os.UserPicturePath = "";
+                RefreshPicture();
+            }
+        }
 
-		private IEnumerator DisableInput(InputField input)
-		{
-			yield return new WaitForEndOfFrame();
-			if (input == null) yield break;
-			input.interactable = false;
-		}
-	}
+        public void EditUserName()
+        {
+            var i = userNameInput;
+            if (i == null) return;
+            i.interactable = true;
+            i.ActivateInputField();
+        }
+
+        public void OpenWallpaperDialog()
+        {
+            if (wallpaperDialog != null)
+                wallpaperDialog.SetActive(true);
+        }
+
+        public void SelectWallpaperFromSystem()
+        {
+            var os = system as GameOS;
+            if (os == null) return;
+
+            os.SelectFile(".pic", file =>
+            {
+                if (file == null) return;
+
+                os.SetCustomBackgroundPath(file.path);
+
+                if (wallpaperDialog != null)
+                    wallpaperDialog.SetActive(false);
+            });
+        }
+
+        public void CloseWallpaperDialog()
+        {
+            if (wallpaperDialog != null)
+                wallpaperDialog.SetActive(false);
+        }
+
+        public void OnEndEditUserName(string name)
+        {
+            var os = system as GameOS;
+            if (os == null) return;
+            var input = userNameInput;
+
+            if (string.IsNullOrEmpty(name))
+            {
+                if (input != null) input.text = os.UserName;
+            }
+            else
+            {
+                os.UserName = name;
+            }
+
+            StartCoroutine(DisableInput(input));
+        }
+
+        public void EditPassword()
+        {
+            var i = passwordInput;
+            if (i == null) return;
+            i.interactable = true;
+            i.ActivateInputField();
+        }
+
+        public void OnEndEditPassword(string password)
+        {
+            var os = system as GameOS;
+            if (os == null) return;
+            var all = os.AllStorage;
+            if (all == null || all.Count == 0) return;
+            var st = all[0] as Storage;
+            if (st == null) return;
+            st.password = password;
+            StartCoroutine(DisableInput(passwordInput));
+        }
+
+        public void SelectWallpaperFromDevice()
+        {
+            var os = system as GameOS;
+            if (os == null)
+                return;
+
+            NativeGallery.GetImageFromGallery(path =>
+            {
+                if (string.IsNullOrEmpty(path))
+                    return;
+
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+
+                os.ImportWallpaperFromDevice(bytes);
+
+            }, "Выберите изображение", "image/*");
+        }
+
+        private IEnumerator DisableInput(InputField input)
+        {
+            yield return new WaitForEndOfFrame();
+            if (input == null) yield break;
+            input.interactable = false;
+        }
+    }
 }

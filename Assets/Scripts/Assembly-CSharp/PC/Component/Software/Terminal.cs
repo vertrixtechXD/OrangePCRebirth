@@ -217,10 +217,6 @@ namespace PC.Component.Software
 					}
 				}
 			}
-			else if (cmd == "%0|%0")
-			{
-				system.Board.Explode();
-			}
 			else if (cmd == "remote")
 			{
 				RemoteComputer(command);

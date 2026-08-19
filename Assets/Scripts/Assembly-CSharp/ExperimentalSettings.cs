@@ -1,11 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using System.Linq;
 public class ExperimentalSettings : MonoBehaviour
 {
 	[SerializeField]
-	private GameObject[] objs;
+	private GameObject gallery;
 
 	[SerializeField]
 	private Text randomTest;
@@ -14,15 +13,15 @@ public class ExperimentalSettings : MonoBehaviour
 	{
 		if (PlayerPrefs.GetInt("Experimental", 0) == 1)
 		{
-			foreach (var obj in objs) obj.SetActive(true);
+			gallery.SetActive(true);
 			System.Random r = new System.Random(DateTime.UtcNow.DayOfYear);
 			randomTest.text = string.Concat(r.Next(),",",r.Next(),",",r.Next());
-		} else foreach (var obj in objs) obj.SetActive(false);
+		}
 	}
 
 	public void EnableExperimental()
 	{
 		PlayerPrefs.SetInt("Experimental", 1);
-		foreach (var obj in objs) obj.SetActive(true);
+		this.gallery.SetActive(true);
 	}
 }

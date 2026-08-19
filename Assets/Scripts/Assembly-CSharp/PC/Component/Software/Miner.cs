@@ -121,7 +121,6 @@ namespace PC.Component.Software
 				if (bitcoinMode)
 				{
 					BitcoinManager.Bitcoin += revenue;
-					BitcoinManager.Save();
 					if (balance_text != null) balance_text.text = BitcoinManager.Bitcoin.ToString("0.####");
 				}
 				else

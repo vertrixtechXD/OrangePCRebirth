@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 484ef020c3930db604de1872bd7b83d7, type: 3}
+  m_Name: KCAS
+  m_EditorClassIdentifier: 
+  itemName: KCAS
+  price: 120
+  bitcoin: 0
+  sprite: {fileID: 21300000, guid: 94154035da25f2c44b981d5563c8e33b, type: 3}
+  spawn: {fileID: 1237095893359166, guid: 990e6101507bad54c845136c4f7c2c63, type: 3}
+  large: 0
+  translateDescription: 1
+  description: 

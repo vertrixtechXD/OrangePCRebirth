@@ -45,7 +45,18 @@ public class Player : MonoBehaviour
 
 	public bool sit;
 
-	public bool pauseControls;
+    // --- Пауза управления ---
+    // При открытии меню/окон скрывает управление, при этом курсор появляется/исчезает
+    private bool _pauseControls;
+    public bool pauseControls
+    {
+        get { return _pauseControls; }
+        set
+        {
+            _pauseControls = value;
+            UpdateCursorState();
+        }
+    }
 
 	private CharacterController controller;
 
@@ -83,6 +94,31 @@ public class Player : MonoBehaviour
 			return;
 		}
 	}
+
+	private void Start()
+	{
+        // инициализация состояния курсора при старте игры
+        UpdateCursorState();
+	}
+
+    // курсор: видимый когда меню открыто или нет
+    private void UpdateCursorState()
+    {
+#if UNITY_STANDALONE || UNITY_EDITOR || UNITY_WEBGL
+        if (_pauseControls)
+        {
+            // если пауза - показываем курсор
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            // если игра - скрыть и заблокировать в центре
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+#endif
+    }
 
 	private void Update()
 	{

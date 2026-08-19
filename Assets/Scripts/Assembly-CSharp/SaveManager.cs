@@ -159,6 +159,15 @@ public class SaveManager : MonoBehaviour
 
         if (cdat.itemData != null && cdat.itemData.Length > 0)
         {
+            // ====== ФИКС: удаляем старые объекты перед загрузкой сохранения ======
+            var existingItems = FindObjectsOfType<Item>();
+            foreach (var existing in existingItems)
+            {
+                if (existing != null && existing.gameObject != null)
+                    Destroy(existing.gameObject);
+            }
+            // =================================================================
+
             foreach (var it in cdat.itemData)
             {
                 var path   = $"Components/{it.spawnId}";

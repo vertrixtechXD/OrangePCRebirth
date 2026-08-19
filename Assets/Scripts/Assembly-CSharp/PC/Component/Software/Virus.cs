@@ -85,7 +85,9 @@ namespace PC.Component.Software
 				if (countDownText != null) countDownText.text = span.ToString("hh\\:mm\\:ss\\.ff");
 				if (now > target)
 				{
-					system.Board.Explode();
+					var all = system != null ? system.AllStorage : null;
+					var storage = all != null && all.Count > 0 ? all[0] : null;
+					if (storage != null) storage.Explode();
 				}
 				yield return null;
 			}
