@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using SaveManagement;
 using System.IO;
-public class Gallery : MonoBehaviour
+public class SaveGallery : MonoBehaviour
 {
 	private class SaveInfo
 	{

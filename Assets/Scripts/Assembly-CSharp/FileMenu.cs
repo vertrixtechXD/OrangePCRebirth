@@ -33,6 +33,15 @@ public class FileMenu : MonoBehaviour
 
 	private List<Load> loads;
 
+	public static bool CompareVersionIgnoringBuild(System.Version a, System.Version b)
+	{
+		if (a == null || b == null)
+			return false;
+
+		return a.Major == b.Major && a.Minor == b.Minor;
+	}
+
+
 	[SerializeField]
 	private FileInformation fileInformation;
 
