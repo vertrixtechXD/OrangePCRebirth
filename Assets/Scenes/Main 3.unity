@@ -1255,7 +1255,6 @@ GameObject:
   - component: {fileID: 665}
   - component: {fileID: 596}
   - component: {fileID: 798}
-  - component: {fileID: 689816196}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -22494,22 +22493,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -30}
   m_SizeDelta: {x: 480, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &689816196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 76}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a831816ec8edac4bb6a852d80dddf9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  functions: {fileID: 798}
-  menuManager: {fileID: 789}
-  shopMenuName: Shop
-  earnMenuName: Earn
 --- !u!1 &693313878
 GameObject:
   m_ObjectHideFlags: 0

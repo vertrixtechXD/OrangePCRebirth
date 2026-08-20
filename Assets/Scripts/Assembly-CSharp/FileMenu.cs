@@ -31,6 +31,9 @@ public class FileMenu : MonoBehaviour
 	[SerializeField]
 	private MessageBox messageBox;
 
+	[SerializeField]
+	private Texture defaultTexture;
+
 	private List<Load> loads;
 
 	public static bool CompareVersionIgnoringBuild(System.Version a, System.Version b)
@@ -81,6 +84,10 @@ public class FileMenu : MonoBehaviour
 			var x = Instantiate(pref, parent, false);
 			x.Find("Name").GetComponent<Text>().text = l.GameData.roomName;
 			x.Find("Hardcore").gameObject.SetActive(l.GameData.hardcore == true);
+			Texture tex = string.IsNullOrEmpty(l.GameData.icon) ? defaultTexture : FormatConverter.StringToTexture(l.GameData.icon);
+			x.Find("Icon").GetComponent<RawImage>().texture = tex;
+			try { x.Find("Info").GetComponent<Text>().text = File.GetLastWriteTime(path).ToString(); }
+			catch { x.Find("Info").GetComponent<Text>().text = "-"; }
 			// add to load list
 			Load v = new Load();
 			v.graphic = x.gameObject;
@@ -88,7 +95,7 @@ public class FileMenu : MonoBehaviour
 			loads.Add(v);
 			// buttons
 			x.Find("Edit").GetComponent<Button>().onClick.AddListener(() => { ShowFileInformation(v); });
-			x.Find("Name").GetComponent<Button>().onClick.AddListener(() => { MainMenu.Instance.LoadFile(l); });
+			x.GetComponent<Button>().onClick.AddListener(() => { MainMenu.Instance.LoadFile(l); });
 			empty.SetActive(loads.Count == 0);
 			return true;
 		}
@@ -109,6 +116,10 @@ public class FileMenu : MonoBehaviour
 		var x = load.graphic.transform;
 		x.Find("Name").GetComponent<Text>().text = load.loader.GameData.roomName;
 		x.Find("Hardcore").gameObject.SetActive(load.loader.GameData.hardcore == true);
+		Texture tex = string.IsNullOrEmpty(load.loader.GameData.icon) ? defaultTexture : FormatConverter.StringToTexture(load.loader.GameData.icon);
+		x.Find("Icon").GetComponent<RawImage>().texture = tex;
+		try { x.Find("Info").GetComponent<Text>().text = File.GetLastWriteTime(load.loader.Path).ToString(); }
+		catch { x.Find("Info").GetComponent<Text>().text = "-"; }
 	}
 
 	public void DeleteLoadButton(Load load)

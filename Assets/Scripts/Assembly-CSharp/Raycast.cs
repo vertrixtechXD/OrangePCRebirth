@@ -364,6 +364,15 @@ public class Raycast : MonoBehaviour
 				rb.constraints = d.oldConstrains;
 				rb.drag = d.oldDrag;
 				rb.angularDrag = d.oldAngularDrag;
+
+				// ====== ЗАЩЁЛКНУТЬ ДВЕРЬ ЕСЛИ ЭТО ОНА ======
+				var latch = rb.GetComponent<DoorLatch>();
+				if (latch != null)
+				{
+					latch.Latch();
+				}
+				// ============================================
+
 				spring.connectedBody = null;
 			}
 
