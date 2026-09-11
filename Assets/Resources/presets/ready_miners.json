@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Bitcoin Miner",
+    "description": "High-performance Bitcoin mining rig",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "Mining Motherboard",
+        "price": 300
+      },
+      {
+        "type": "CPU",
+        "name": "AMD Ryzen 9 5950X",
+        "price": 700
+      },
+      {
+        "type": "GPU",
+        "name": "6x NVIDIA RTX 3080",
+        "price": 12000
+      },
+      {
+        "type": "RAM",
+        "name": "64GB DDR4",
+        "price": 250
+      },
+      {
+        "type": "Storage",
+        "name": "1TB SSD",
+        "price": 100
+      },
+      {
+        "type": "PSU",
+        "name": "2000W Platinum",
+        "price": 400
+      },
+      {
+        "type": "Cooler",
+        "name": "Industrial Cooling",
+        "price": 300
+      }
+    ],
+    "totalPrice": 13550,
+    "hashRate": "500 TH/s",
+    "powerConsumption": "3000W",
+    "miningAlgorithm": "SHA-256"
+  },
+  {
+    "name": "Ethereum Miner",
+    "description": "GPU mining rig for Ethereum",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "Mining Motherboard",
+        "price": 250
+      },
+      {
+        "type": "CPU",
+        "name": "Intel Celeron G5900",
+        "price": 50
+      },
+      {
+        "type": "GPU",
+        "name": "8x AMD RX 6800 XT",
+        "price": 10000
+      },
+      {
+        "type": "RAM",
+        "name": "32GB DDR4",
+        "price": 120
+      },
+      {
+        "type": "Storage",
+        "name": "512GB SSD",
+        "price": 60
+      },
+      {
+        "type": "PSU",
+        "name": "1500W Gold",
+        "price": 300
+      },
+      {
+        "type": "Cooler",
+        "name": "Industrial Cooling",
+        "price": 250
+      }
+    ],
+    "totalPrice": 10980,
+    "hashRate": "2 GH/s",
+    "powerConsumption": "2200W",
+    "miningAlgorithm": "Ethash"
+  },
+  {
+    "name": "Litecoin Miner",
+    "description": "Scrypt mining rig",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "Mining Motherboard",
+        "price": 200
+      },
+      {
+        "type": "CPU",
+        "name": "AMD Ryzen 7 5800X",
+        "price": 400
+      },
+      {
+        "type": "GPU",
+        "name": "4x NVIDIA RTX 3070",
+        "price": 4000
+      },
+      {
+        "type": "RAM",
+        "name": "32GB DDR4",
+        "price": 120
+      },
+      {
+        "type": "Storage",
+        "name": "1TB SSD",
+        "price": 100
+      },
+      {
+        "type": "PSU",
+        "name": "1200W Gold",
+        "price": 250
+      },
+      {
+        "type": "Cooler",
+        "name": "Industrial Cooling",
+        "price": 200
+      }
+    ],
+    "totalPrice": 5070,
+    "hashRate": "500 MH/s",
+    "powerConsumption": "1500W",
+    "miningAlgorithm": "Scrypt"
+  }
+]

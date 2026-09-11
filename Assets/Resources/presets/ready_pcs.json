@@ -1,0 +1,131 @@
+[
+  {
+    "name": "Gaming PC",
+    "description": "High-performance gaming computer",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "ASUS ROG Strix",
+        "price": 250
+      },
+      {
+        "type": "CPU",
+        "name": "Intel Core i9-13900K",
+        "price": 600
+      },
+      {
+        "type": "GPU",
+        "name": "NVIDIA RTX 4090",
+        "price": 1800
+      },
+      {
+        "type": "RAM",
+        "name": "32GB DDR5",
+        "price": 150
+      },
+      {
+        "type": "Storage",
+        "name": "1TB NVMe SSD",
+        "price": 120
+      },
+      {
+        "type": "PSU",
+        "name": "1000W Gold",
+        "price": 200
+      },
+      {
+        "type": "Cooler",
+        "name": "Liquid Cooler",
+        "price": 150
+      }
+    ],
+    "totalPrice": 3270,
+    "performance": "High"
+  },
+  {
+    "name": "Office PC",
+    "description": "Basic office computer",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "Standard ATX",
+        "price": 100
+      },
+      {
+        "type": "CPU",
+        "name": "Intel Core i5-12400",
+        "price": 200
+      },
+      {
+        "type": "GPU",
+        "name": "Integrated Graphics",
+        "price": 0
+      },
+      {
+        "type": "RAM",
+        "name": "16GB DDR4",
+        "price": 60
+      },
+      {
+        "type": "Storage",
+        "name": "512GB SSD",
+        "price": 50
+      },
+      {
+        "type": "PSU",
+        "name": "500W",
+        "price": 80
+      },
+      {
+        "type": "Cooler",
+        "name": "Stock Cooler",
+        "price": 20
+      }
+    ],
+    "totalPrice": 510,
+    "performance": "Medium"
+  },
+  {
+    "name": "Budget PC",
+    "description": "Affordable basic computer",
+    "components": [
+      {
+        "type": "Motherboard",
+        "name": "Micro ATX",
+        "price": 70
+      },
+      {
+        "type": "CPU",
+        "name": "Intel Core i3-12100",
+        "price": 120
+      },
+      {
+        "type": "GPU",
+        "name": "Integrated Graphics",
+        "price": 0
+      },
+      {
+        "type": "RAM",
+        "name": "8GB DDR4",
+        "price": 30
+      },
+      {
+        "type": "Storage",
+        "name": "256GB SSD",
+        "price": 30
+      },
+      {
+        "type": "PSU",
+        "name": "400W",
+        "price": 50
+      },
+      {
+        "type": "Cooler",
+        "name": "Stock Cooler",
+        "price": 15
+      }
+    ],
+    "totalPrice": 315,
+    "performance": "Low"
+  }
+]
